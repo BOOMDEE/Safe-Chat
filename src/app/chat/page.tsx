@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Send, LogOut, UserCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -113,7 +114,7 @@ export default function ChatPage() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <p className="text-muted-foreground">Loading session...</p>
+          <p className="text-muted-foreground">正在加载会话...</p>
         </div>
       </div>
     );
@@ -127,12 +128,12 @@ export default function ChatPage() {
              <div className="p-2 bg-primary text-primary-foreground rounded-full">
                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 6-2 5h4l-2 5"/><path d="M7 13v2a4 4 0 0 0 4 4h0a4 4 0 0 0 4-4v-2"/><path d="M17 11V9a4 4 0 0 0-4-4h0a4 4 0 0 0-4 4v2"/></svg>
             </div>
-            <h1 className="text-xl font-bold font-headline">CipherChat</h1>
+            <h1 className="text-xl font-bold font-headline">Ssfe Chat</h1>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <UserCircle className="h-5 w-5" />
-              <span>User {currentUser}</span>
+              <span>用户 {currentUser}</span>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -141,7 +142,7 @@ export default function ChatPage() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Logout & Clear Session</p>
+                <p>登出并清除会话</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -152,8 +153,8 @@ export default function ChatPage() {
             <div className="p-4 md:p-6 space-y-6">
               {messages.length === 0 ? (
                  <div className="text-center text-muted-foreground py-10">
-                    <p>No messages yet.</p>
-                    <p className="text-xs">Messages will disappear after one hour.</p>
+                    <p>暂无消息。</p>
+                    <p className="text-xs">消息将在一小时后消失。</p>
                  </div>
               ) : (
                 messages.map((msg) => (
@@ -179,7 +180,7 @@ export default function ChatPage() {
                     >
                       <p className="text-base whitespace-pre-wrap break-words">{msg.text}</p>
                       <p className={cn("mt-2 text-xs opacity-70 text-right", msg.sender === currentUser ? 'text-primary-foreground/70' : 'text-muted-foreground')}>
-                        {format(new Date(msg.timestamp), 'p')}
+                        {format(new Date(msg.timestamp), 'p', { locale: zhCN })}
                       </p>
                     </div>
                     {msg.sender === currentUser && (
@@ -199,7 +200,7 @@ export default function ChatPage() {
             <Textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your secure message..."
+              placeholder="输入您的安全信息..."
               className="flex-1 resize-none bg-card"
               rows={1}
               onKeyDown={(e) => {
@@ -211,7 +212,7 @@ export default function ChatPage() {
             />
             <Button type="submit" size="icon" className="bg-accent hover:bg-accent/90 h-10 w-10 shrink-0" disabled={!newMessage.trim()}>
               <Send className="h-5 w-5" />
-              <span className="sr-only">Send Message</span>
+              <span className="sr-only">发送消息</span>
             </Button>
           </form>
         </footer>

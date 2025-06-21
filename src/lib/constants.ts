@@ -5,5 +5,5 @@ export const PIN_USER_MAP: Record<string, string> = {
   '4053': '45',
 };
 
-export const MESSAGES_STORAGE_KEY = 'cipherchat-messages';
-export const USER_ID_SESSION_KEY = 'cipherchat-userId';
+export const MESSAGES_STORAGE_KEY = 'ssfechat-messages';
+export const USER_ID_SESSION_KEY = 'ssfechat-userId';

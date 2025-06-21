@@ -39,8 +39,8 @@ export default function LoginPage() {
         localStorage.removeItem(MESSAGES_STORAGE_KEY);
         toast({
           variant: "destructive",
-          title: "PIN Invalid",
-          description: "All message history has been cleared for security.",
+          title: "PIN 码无效",
+          description: "为安全起见，所有聊天记录已被清除。",
         });
         setPin('');
       }
@@ -55,8 +55,8 @@ export default function LoginPage() {
           <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit mb-4">
             <ShieldCheck className="h-8 w-8" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">CipherChat</CardTitle>
-          <CardDescription>Enter your PIN to begin a secure session.</CardDescription>
+          <CardTitle className="text-3xl font-bold font-headline">Ssfe Chat</CardTitle>
+          <CardDescription>输入您的 PIN 码以开始安全会话。</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
@@ -76,10 +76,10 @@ export default function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full h-12 text-lg" disabled={isLoading || pin.length !== 4}>
-              {isLoading ? 'Verifying...' : 'Unlock'}
+              {isLoading ? '验证中...' : '解锁'}
               <Lock className="ml-2 h-5 w-5" />
             </Button>
-            <p className="text-xs text-muted-foreground text-center">A failed attempt will erase all message history.</p>
+            <p className="text-xs text-muted-foreground text-center">登录失败将清除所有聊天记录。</p>
           </CardFooter>
         </form>
       </Card>
