@@ -2,15 +2,26 @@
 
 import { useEffect, useState, useRef, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Send, LogOut, UserCircle } from 'lucide-react';
+import { Send, LogOut, UserCircle, Trash2, ShieldAlert } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Message } from '@/lib/types';
 import { MESSAGES_STORAGE_KEY, USER_ID_SESSION_KEY } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -22,7 +33,24 @@ export default function ChatPage() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isWindowFocused, setIsWindowFocused] = useState(true);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
+
+  // Screenshot prevention effect
+  useEffect(() => {
+    const handleFocus = () => setIsWindowFocused(true);
+    const handleBlur = () => setIsWindowFocused(false);
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+
+    setIsWindowFocused(document.hasFocus());
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
 
   // Auth check and initial load
   useEffect(() => {
@@ -89,6 +117,11 @@ export default function ChatPage() {
     router.push('/');
   };
 
+  const handleClearChat = () => {
+    setMessages([]);
+    localStorage.removeItem(MESSAGES_STORAGE_KEY);
+  };
+
   const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '' || !currentUser) return;
@@ -122,19 +155,49 @@ export default function ChatPage() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen flex-col bg-muted/30">
-        <header className="flex items-center justify-between border-b bg-background p-3 shadow-sm z-10">
+      <div className="flex h-screen flex-col bg-muted/30 relative">
+        <header className={cn("flex items-center justify-between border-b bg-background p-3 shadow-sm z-10 transition-all", { 'blur-sm pointer-events-none': !isWindowFocused })}>
           <div className="flex items-center gap-3">
              <div className="p-2 bg-primary text-primary-foreground rounded-full">
                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 6-2 5h4l-2 5"/><path d="M7 13v2a4 4 0 0 0 4 4h0a4 4 0 0 0 4-4v-2"/><path d="M17 11V9a4 4 0 0 0-4-4h0a4 4 0 0 0-4 4v2"/></svg>
             </div>
-            <h1 className="text-xl font-bold font-headline">Ssfe Chat</h1>
+            <h1 className="text-xl font-bold font-headline">Safe Chat</h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <UserCircle className="h-5 w-5" />
               <span>用户 {currentUser}</span>
             </div>
+            
+            <AlertDialog>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertDialogTrigger asChild>
+                     <Button variant="ghost" size="icon" disabled={messages.length === 0}>
+                        <Trash2 className="h-5 w-5" />
+                     </Button>
+                  </AlertDialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>清除聊天记录</p>
+                </TooltipContent>
+              </Tooltip>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确定要清除聊天记录吗？</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    此操作将永久删除所有消息，且无法撤销。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>取消</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearChat} className={buttonVariants({ variant: "destructive" })}>
+                    确认清除
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={handleLogout}>
@@ -142,19 +205,19 @@ export default function ChatPage() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>登出并清除会话</p>
+                <p>登出</p>
               </TooltipContent>
             </Tooltip>
           </div>
         </header>
 
-        <main className="flex-1 overflow-hidden">
+        <main className={cn("flex-1 overflow-hidden transition-all", { 'blur-sm pointer-events-none': !isWindowFocused })}>
           <ScrollArea className="h-full" viewportRef={scrollViewportRef}>
             <div className="p-4 md:p-6 space-y-6">
               {messages.length === 0 ? (
                  <div className="text-center text-muted-foreground py-10">
                     <p>暂无消息。</p>
-                    <p className="text-xs">消息将在一小时后消失。</p>
+                    <p className="text-xs">开始聊天，或放心，消息将在一小时后自动消失。</p>
                  </div>
               ) : (
                 messages.map((msg) => (
@@ -195,7 +258,7 @@ export default function ChatPage() {
           </ScrollArea>
         </main>
         
-        <footer className="border-t bg-background p-4">
+        <footer className={cn("border-t bg-background p-4 transition-all", { 'blur-sm pointer-events-none': !isWindowFocused })}>
           <form className="flex items-start gap-2" onSubmit={handleSendMessage}>
             <Textarea
               value={newMessage}
@@ -216,6 +279,14 @@ export default function ChatPage() {
             </Button>
           </form>
         </footer>
+
+        {!isWindowFocused && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in-0">
+            <ShieldAlert className="h-16 w-16 text-primary" />
+            <h2 className="mt-4 text-2xl font-bold">会话已暂停</h2>
+            <p className="mt-2 text-muted-foreground">为保护您的隐私，请返回此窗口以继续。</p>
+          </div>
+        )}
       </div>
     </TooltipProvider>
   );

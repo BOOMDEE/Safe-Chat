@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Ssfe Chat',
+  title: 'Safe Chat',
   description: '安全、即时的消息传递。',
 };
 

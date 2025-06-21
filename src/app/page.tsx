@@ -55,7 +55,7 @@ export default function LoginPage() {
           <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit mb-4">
             <ShieldCheck className="h-8 w-8" />
           </div>
-          <CardTitle className="text-3xl font-bold font-headline">Ssfe Chat</CardTitle>
+          <CardTitle className="text-3xl font-bold font-headline">Safe Chat</CardTitle>
           <CardDescription>输入您的 PIN 码以开始安全会话。</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
