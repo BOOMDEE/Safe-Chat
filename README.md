@@ -28,7 +28,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone <your-repository-url>
+git clone <repository-url>
 cd <repository-folder>
 ```
 
